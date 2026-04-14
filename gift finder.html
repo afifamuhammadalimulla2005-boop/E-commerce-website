@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giftly ✨ — Find the Perfect Gift</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rose: #FF6B6B;
+    --peach: #FF8E53;
+    --gold: #FFD166;
+    --mint: #06D6A0;
+    --lavender: #845EC2;
+    --soft-lavender: #C9B1E0;
+    --cream: #FFF0F3;
+    --dark: #1A1225;
+    --card-bg: #FFFFFF;
+    --text: #2D2040;
+    --muted: #9A6C7A;
+    --border: rgba(255,107,140,0.18);
+    --shadow: 0 8px 32px rgba(255,107,140,0.13);
+    --shadow-hover: 0 16px 48px rgba(255,107,140,0.24);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ─── BACKGROUND ─── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 0%, rgba(255,182,193,0.45) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 90% 100%, rgba(255,105,135,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 50% 40%, rgba(255,220,230,0.35) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(16px) saturate(180%);
+    background: rgba(255,240,243,0.88);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--rose), var(--lavender));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+    text-decoration: none;
+  }
+
+  .logo span { font-style: italic; }
+
+  .header-right { display: flex; align-items: center; gap: 1rem; }
+
+  .cart-btn {
+    position: relative; cursor: pointer;
+    background: linear-gradient(135deg, var(--rose), var(--lavender));
+    border: none; border-radius: 50px;
+    padding: 0.5rem 1.2rem;
+    color: white; font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; font-weight: 600;
+    display: flex; align-items: center; gap: 0.5rem;
+    transition: all 0.25s ease; box-shadow: 0 4px 16px rgba(255,107,107,0.3);
+  }
+  .cart-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,107,107,0.4); }
+
+  .cart-badge {
+    position: absolute; top: -6px; right: -6px;
+    background: var(--gold); color: var(--dark);
+    border-radius: 50%; width: 20px; height: 20px;
+    font-size: 0.65rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .cart-badge.pop { animation: badgePop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes badgePop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.5)} }
+
+  /* ─── MAIN LAYOUT ─── */
+  main { position: relative; z-index: 1; }
+
+  /* ─── WIZARD ─── */
+  #wizard-section {
+    max-width: 680px; margin: 0 auto;
+    padding: 4rem 2rem 2rem;
+    animation: fadeUp 0.6s ease both;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+  .wizard-header { text-align: center; margin-bottom: 2.5rem; }
+  .wizard-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.2; margin-bottom: 0.75rem;
+  }
+  .wizard-header h1 em { font-style: italic; color: var(--lavender); }
+  .wizard-header p { color: var(--muted); font-size: 1.05rem; }
+
+  /* Progress Bar */
+  .progress-wrap { margin-bottom: 2.5rem; }
+  .progress-steps { display: flex; justify-content: space-between; margin-bottom: 0.75rem; }
+  .step-dot {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: white; border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 600; color: var(--muted);
+    transition: all 0.3s ease; position: relative;
+    cursor: default;
+  }
+  .step-dot.active { background: var(--lavender); border-color: var(--lavender); color: white; box-shadow: 0 4px 16px rgba(132,94,194,0.4); }
+  .step-dot.done { background: var(--mint); border-color: var(--mint); color: white; }
+  .step-dot.done::after { content: '✓'; position: absolute; }
+  .step-dot.done span { display: none; }
+
+  .progress-track { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, var(--rose), var(--lavender));
+    transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  /* Wizard Card */
+  .wizard-card {
+    background: white; border-radius: 24px;
+    padding: 2.5rem; box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    animation: cardIn 0.4s ease both;
+  }
+  @keyframes cardIn { from{opacity:0;transform:translateY(16px) scale(0.98)} to{opacity:1;transform:none} }
+
+  .wizard-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; margin-bottom: 0.4rem;
+  }
+  .wizard-card .sub { color: var(--muted); margin-bottom: 1.8rem; font-size: 0.95rem; }
+
+  /* Illustration */
+  .wizard-illustration {
+    font-size: 5rem; text-align: center; margin-bottom: 1.5rem;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+  /* Option Pills */
+  .options-grid {
+    display: grid; gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+  .option-pill {
+    cursor: pointer; padding: 0.9rem 1rem;
+    background: var(--cream); border: 2px solid var(--border);
+    border-radius: 16px; text-align: center;
+    transition: all 0.2s ease; font-size: 0.9rem; font-weight: 500;
+    display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+  }
+  .option-pill .emoji { font-size: 1.6rem; }
+  .option-pill:hover { border-color: #FFB3C6; background: #FFF0F5; transform: translateY(-2px); }
+  .option-pill.selected { border-color: #FF6B8A; background: #FFE0EA; color: #CC3355; box-shadow: 0 4px 16px rgba(255,107,138,0.25); }
+
+  /* Budget Slider */
+  .budget-display {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem; text-align: center;
+    color: #FF6B8A; margin-bottom: 1rem;
+    font-weight: 700;
+  }
+  .budget-display span { font-size: 1.2rem; vertical-align: super; }
+  input[type=range] {
+    width: 100%; height: 8px; -webkit-appearance: none;
+    background: linear-gradient(90deg, #FF6B8A var(--pct,50%), var(--border) var(--pct,50%));
+    border-radius: 99px; outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 24px; height: 24px;
+    border-radius: 50%; background: white;
+    border: 3px solid #FF6B8A; box-shadow: 0 2px 12px rgba(255,107,138,0.4);
+    transition: transform 0.2s ease;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  .budget-labels { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.8rem; margin-top: 0.5rem; }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 0.75rem; margin-top: 2rem; justify-content: flex-end; }
+  .btn {
+    padding: 0.75rem 1.8rem; border-radius: 50px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; border: none; transition: all 0.25s ease;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--rose), var(--lavender));
+    color: white; box-shadow: 0 4px 16px rgba(255,107,107,0.35);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,107,107,0.45); }
+  .btn-secondary { background: var(--cream); color: var(--muted); border: 2px solid var(--border); }
+  .btn-secondary:hover { border-color: #FFB3C6; color: #CC3355; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+  /* ─── SHOP SECTION ─── */
+  #shop-section { display: none; padding: 2rem; max-width: 1300px; margin: 0 auto; }
+  #shop-section.visible { display: block; animation: fadeUp 0.5s ease both; }
+
+  .shop-hero {
+    text-align: center; padding: 2.5rem 0 2rem;
+  }
+  .shop-hero h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem); margin-bottom: 0.5rem;
+  }
+  .shop-hero p { color: var(--muted); }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 1rem; }
+  .tag {
+    background: linear-gradient(135deg, rgba(255,107,140,0.12), rgba(255,182,193,0.18));
+    border: 1px solid rgba(255,107,140,0.2); border-radius: 50px;
+    padding: 0.35rem 0.9rem; font-size: 0.82rem; font-weight: 500; color: #CC3355;
+  }
+
+  /* Controls Bar */
+  .controls-bar {
+    display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+    background: white; border-radius: 20px; padding: 1.2rem 1.5rem;
+    box-shadow: var(--shadow); border: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+
+  .search-wrap {
+    flex: 1; min-width: 200px;
+    position: relative;
+  }
+  .search-wrap svg { position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--muted); }
+  .search-input {
+    width: 100%; padding: 0.65rem 1rem 0.65rem 2.5rem;
+    border: 2px solid var(--border); border-radius: 50px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+    background: var(--cream); outline: none; transition: border 0.2s;
+  }
+  .search-input:focus { border-color: #FFB3C6; }
+
+  .filter-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .chip {
+    padding: 0.4rem 1rem; border-radius: 50px;
+    border: 2px solid var(--border); background: var(--cream);
+    font-size: 0.82rem; font-weight: 600; cursor: pointer; color: var(--muted);
+    transition: all 0.2s;
+  }
+  .chip:hover { border-color: #FFB3C6; color: #CC3355; }
+  .chip.active { background: #FF6B8A; border-color: #FF6B8A; color: white; }
+
+  .price-filter { display: flex; align-items: center; gap: 0.5rem; }
+  .price-filter label { font-size: 0.82rem; color: var(--muted); font-weight: 600; white-space: nowrap; }
+  .price-select {
+    border: 2px solid var(--border); border-radius: 50px;
+    padding: 0.4rem 0.8rem; background: var(--cream);
+    font-family: 'DM Sans', sans-serif; font-size: 0.82rem;
+    outline: none; cursor: pointer; color: var(--text);
+  }
+
+  /* Product Grid */
+  .results-info { color: var(--muted); font-size: 0.85rem; margin-bottom: 1rem; }
+  .results-info strong { color: #FF6B8A; }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+
+  /* Product Card */
+  .product-card {
+    background: white; border-radius: 24px;
+    border: 1px solid var(--border); overflow: hidden;
+    box-shadow: var(--shadow); transition: all 0.3s ease;
+    display: flex; flex-direction: column;
+    animation: fadeUp 0.4s ease both;
+  }
+  .product-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); }
+
+  .card-image {
+    height: 200px; display: flex; align-items: center; justify-content: center;
+    font-size: 4rem; position: relative; overflow: hidden;
+    transition: transform 0.4s ease;
+  }
+  .product-card:hover .card-image { transform: scale(1.05); }
+
+  .badge {
+    position: absolute; top: 12px; left: 12px;
+    padding: 0.25rem 0.7rem; border-radius: 50px;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .badge-popular { background: var(--gold); color: var(--dark); }
+  .badge-new { background: var(--mint); color: white; }
+  .badge-sale { background: var(--rose); color: white; }
+
+  .wishlist-btn {
+    position: absolute; top: 12px; right: 12px;
+    background: white; border: none; border-radius: 50%;
+    width: 34px; height: 34px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s; color: var(--muted);
+  }
+  .wishlist-btn:hover, .wishlist-btn.loved { color: var(--rose); transform: scale(1.1); }
+
+  .card-body { padding: 1.2rem; flex: 1; display: flex; flex-direction: column; }
+  .card-category {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: #FF6B8A; margin-bottom: 0.4rem;
+  }
+  .card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem; font-weight: 700; line-height: 1.3;
+    margin-bottom: 0.4rem;
+  }
+  .card-desc { font-size: 0.82rem; color: var(--muted); margin-bottom: 1rem; flex: 1; line-height: 1.5; }
+  .card-rating { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.8rem; }
+  .stars { color: var(--gold); font-size: 0.8rem; }
+  .rating-count { font-size: 0.75rem; color: var(--muted); }
+
+  .card-footer { display: flex; align-items: center; justify-content: space-between; }
+  .card-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem; font-weight: 700; color: var(--text);
+  }
+  .card-price .original {
+    font-size: 0.85rem; color: var(--muted);
+    text-decoration: line-through; font-weight: 400;
+    margin-right: 0.4rem; font-family: 'DM Sans', sans-serif;
+  }
+
+  .add-btn {
+    background: linear-gradient(135deg, var(--rose), var(--lavender));
+    color: white; border: none; border-radius: 50px;
+    padding: 0.55rem 1.1rem; font-size: 0.82rem; font-weight: 600;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(255,107,107,0.3);
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .add-btn:hover { transform: scale(1.05); box-shadow: 0 6px 18px rgba(255,107,107,0.4); }
+  .add-btn.added { background: linear-gradient(135deg, var(--mint), #04b585); box-shadow: 0 4px 12px rgba(6,214,160,0.3); }
+
+  .no-results {
+    grid-column: 1/-1; text-align: center;
+    padding: 4rem; color: var(--muted);
+  }
+  .no-results .nr-icon { font-size: 4rem; margin-bottom: 1rem; }
+  .no-results h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 0.5rem; color: var(--text); }
+
+  /* ─── CART OVERLAY ─── */
+  .cart-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(26,18,37,0.5); backdrop-filter: blur(4px);
+    display: none; opacity: 0; transition: opacity 0.3s;
+  }
+  .cart-overlay.open { display: block; opacity: 1; }
+
+  .cart-panel {
+    position: fixed; right: 0; top: 0; bottom: 0;
+    width: min(420px, 100vw); background: white;
+    box-shadow: -8px 0 48px rgba(0,0,0,0.15);
+    display: flex; flex-direction: column;
+    transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.34,1.2,0.64,1);
+    z-index: 201;
+  }
+  .cart-overlay.open .cart-panel { transform: translateX(0); }
+
+  .cart-head {
+    padding: 1.5rem; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .cart-head h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; }
+  .close-cart {
+    background: var(--cream); border: none; border-radius: 50%;
+    width: 38px; height: 38px; cursor: pointer; font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .close-cart:hover { background: #FFE5E5; }
+
+  .cart-items { flex: 1; overflow-y: auto; padding: 1rem 1.5rem; }
+  .cart-empty {
+    height: 100%; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 1rem;
+    color: var(--muted); text-align: center;
+  }
+  .cart-empty .empty-icon { font-size: 4rem; animation: float 3s ease-in-out infinite; }
+
+  .cart-item {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1rem 0; border-bottom: 1px solid var(--border);
+    animation: fadeUp 0.3s ease both;
+  }
+  .ci-image {
+    width: 60px; height: 60px; border-radius: 14px;
+    background: var(--cream); display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; flex-shrink: 0;
+  }
+  .ci-info { flex: 1; }
+  .ci-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.2rem; }
+  .ci-price { color: #FF6B8A; font-weight: 700; font-size: 0.9rem; }
+  .ci-qty {
+    display: flex; align-items: center; gap: 0.5rem;
+    margin-top: 0.4rem;
+  }
+  .qty-btn {
+    width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--border);
+    background: var(--cream); cursor: pointer; font-size: 0.85rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; color: var(--text);
+  }
+  .qty-btn:hover { border-color: #FF6B8A; color: #FF6B8A; }
+  .qty-num { font-size: 0.85rem; font-weight: 600; min-width: 20px; text-align: center; }
+  .ci-remove {
+    background: none; border: none; cursor: pointer; color: var(--muted);
+    font-size: 1rem; padding: 0.25rem; border-radius: 8px; transition: color 0.15s;
+  }
+  .ci-remove:hover { color: var(--rose); }
+
+  .cart-foot { padding: 1.5rem; border-top: 1px solid var(--border); }
+  .cart-total {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 1.2rem;
+  }
+  .cart-total .label { font-weight: 600; color: var(--muted); }
+  .cart-total .amount {
+    font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700;
+    color: var(--text);
+  }
+  .checkout-btn {
+    width: 100%; padding: 1rem; border: none; border-radius: 16px;
+    background: linear-gradient(135deg, var(--rose), var(--lavender));
+    color: white; font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 700; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(255,107,107,0.35);
+    transition: all 0.25s; letter-spacing: 0.3px;
+  }
+  .checkout-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(255,107,107,0.45); }
+  .checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: var(--dark); color: white;
+    padding: 0.75rem 1.5rem; border-radius: 50px;
+    font-size: 0.9rem; font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    z-index: 300; display: flex; align-items: center; gap: 0.5rem;
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    text-align: center; padding: 2rem;
+    color: var(--muted); font-size: 0.82rem;
+    border-top: 1px solid var(--border); margin-top: 4rem;
+  }
+  footer a { color: #FF6B8A; text-decoration: none; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 600px) {
+    header { padding: 0 1rem; }
+    #wizard-section { padding: 2rem 1rem; }
+    .options-grid { grid-template-columns: repeat(2, 1fr); }
+    .controls-bar { flex-direction: column; }
+    .search-wrap { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a class="logo" href="#">Gift<span>ly</span> ✨</a>
+  <div class="header-right">
+    <button class="cart-btn" onclick="openCart()">
+      🛒 Cart
+      <span class="cart-badge" id="cart-badge">0</span>
+    </button>
+  </div>
+</header>
+
+<!-- WIZARD SECTION -->
+<section id="wizard-section">
+  <div class="wizard-header">
+    <h1>Find the <em>Perfect</em> Gift</h1>
+    <p>Answer 3 quick questions and we'll find exactly what they'll love 💝</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-steps">
+      <div class="step-dot active" id="dot-1"><span>1</span></div>
+      <div class="step-dot" id="dot-2"><span>2</span></div>
+      <div class="step-dot" id="dot-3"><span>3</span></div>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width:5%"></div>
+    </div>
+  </div>
+
+  <!-- Step 1: Relationship -->
+  <div class="wizard-card" id="step-1">
+    <div class="wizard-illustration" id="step1-ill">💌</div>
+    <h2>Who are you gifting?</h2>
+    <p class="sub">Tell us about your special someone</p>
+    <div class="options-grid">
+      <div class="option-pill" data-step="1" data-val="Partner" onclick="selectOption(this)"><span class="emoji">💑</span>Partner</div>
+      <div class="option-pill" data-step="1" data-val="Parent" onclick="selectOption(this)"><span class="emoji">👨‍👩‍👧</span>Parent</div>
+      <div class="option-pill" data-step="1" data-val="Friend" onclick="selectOption(this)"><span class="emoji">👯</span>Friend</div>
+      <div class="option-pill" data-step="1" data-val="Sibling" onclick="selectOption(this)"><span class="emoji">🧑‍🤝‍🧑</span>Sibling</div>
+      <div class="option-pill" data-step="1" data-val="Colleague" onclick="selectOption(this)"><span class="emoji">💼</span>Colleague</div>
+      <div class="option-pill" data-step="1" data-val="Child" onclick="selectOption(this)"><span class="emoji">🧒</span>Child</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="step1-next" onclick="nextStep(2)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Age -->
+  <div class="wizard-card" id="step-2" style="display:none">
+    <div class="wizard-illustration">🎂</div>
+    <h2>How old are they?</h2>
+    <p class="sub">Age helps us find age-appropriate gifts</p>
+    <div class="options-grid">
+      <div class="option-pill" data-step="2" data-val="Kid (0–12)" onclick="selectOption(this)"><span class="emoji">🧸</span>Kid (0–12)</div>
+      <div class="option-pill" data-step="2" data-val="Teen (13–17)" onclick="selectOption(this)"><span class="emoji">🎮</span>Teen (13–17)</div>
+      <div class="option-pill" data-step="2" data-val="Young Adult (18–30)" onclick="selectOption(this)"><span class="emoji">🎯</span>Young Adult</div>
+      <div class="option-pill" data-step="2" data-val="Adult (31–60)" onclick="selectOption(this)"><span class="emoji">☕</span>Adult (31–60)</div>
+      <div class="option-pill" data-step="2" data-val="Senior (60+)" onclick="selectOption(this)"><span class="emoji">🌿</span>Senior (60+)</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goBack(1)">← Back</button>
+      <button class="btn btn-primary" id="step2-next" onclick="nextStep(3)" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Budget -->
+  <div class="wizard-card" id="step-3" style="display:none">
+    <div class="wizard-illustration">💰</div>
+    <h2>What's your budget?</h2>
+    <p class="sub">We'll find the best gifts in your range</p>
+    <div class="budget-display"><span>₹</span><span id="budget-val">2500</span></div>
+    <input type="range" id="budget-slider" min="200" max="10000" step="100" value="2500"
+           oninput="updateBudget(this.value)">
+    <div class="budget-labels"><span>₹200</span><span>₹10,000</span></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goBack(2)">← Back</button>
+      <button class="btn btn-primary" onclick="findGifts()">✨ Find Gifts!</button>
+    </div>
+  </div>
+</section>
+
+<!-- SHOP SECTION -->
+<section id="shop-section">
+  <div class="shop-hero">
+    <h2>🎁 Here Are Their <em style="font-style:italic;color:#FF6B8A">Perfect</em> Gifts</h2>
+    <p id="shop-subtitle">Curated just for them</p>
+    <div class="tag-row" id="tag-row"></div>
+    <button class="btn btn-secondary" onclick="resetWizard()" style="margin-top:1rem; font-size:0.85rem">↩ Change Preferences</button>
+  </div>
+
+  <!-- Controls Bar -->
+  <div class="controls-bar">
+    <div class="search-wrap">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input class="search-input" type="text" placeholder="Search gifts..." id="search-input" oninput="filterProducts()">
+    </div>
+    <div class="filter-chips" id="category-chips">
+      <div class="chip active" data-cat="All" onclick="filterCat(this)">All</div>
+      <div class="chip" data-cat="Tech" onclick="filterCat(this)">⚡ Tech</div>
+      <div class="chip" data-cat="Wellness" onclick="filterCat(this)">🌿 Wellness</div>
+      <div class="chip" data-cat="Fashion" onclick="filterCat(this)">👗 Fashion</div>
+      <div class="chip" data-cat="Books" onclick="filterCat(this)">📚 Books</div>
+      <div class="chip" data-cat="Home" onclick="filterCat(this)">🏡 Home</div>
+      <div class="chip" data-cat="Food" onclick="filterCat(this)">🍫 Food</div>
+      <div class="chip" data-cat="Experience" onclick="filterCat(this)">✨ Experience</div>
+      <div class="chip" data-cat="Toys" onclick="filterCat(this)">🧸 Toys</div>
+    </div>
+    <div class="price-filter">
+      <label>Price</label>
+      <select class="price-select" id="price-select" onchange="filterProducts()">
+        <option value="all">Any Price</option>
+        <option value="budget">Under ₹500</option>
+        <option value="mid">₹500 – ₹2,000</option>
+        <option value="premium">₹2,000 – ₹5,000</option>
+        <option value="luxury">₹5,000+</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="results-info" id="results-info"></div>
+  <div class="products-grid" id="products-grid"></div>
+</section>
+
+<!-- CART OVERLAY -->
+<div class="cart-overlay" id="cart-overlay" onclick="handleOverlayClick(event)">
+  <div class="cart-panel">
+    <div class="cart-head">
+      <h2>🛍️ Your Cart</h2>
+      <button class="close-cart" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-foot">
+      <div class="cart-total">
+        <span class="label">Total</span>
+        <span class="amount" id="cart-total">₹0</span>
+      </div>
+      <button class="checkout-btn" id="checkout-btn" onclick="checkout()" disabled>
+        Checkout 🎉
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- FOOTER -->
+<footer>
+  Made with ❤️ by <a href="#">Giftly</a> — Finding joy, one gift at a time ✨
+</footer>
+
+<script>
+// ─────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────
+const ALL_PRODUCTS = [
+  { id:1, name:"Wireless Earbuds Pro", cat:"Tech", price:1999, originalPrice:2499, emoji:"🎧", desc:"Crystal-clear sound with 30h battery. Perfect everyday companion.", rating:4.8, reviews:2340, badge:"popular", tags:["Partner","Friend","Sibling","Young Adult","Adult"] },
+  { id:2, name:"Artisan Coffee Gift Set", cat:"Food", price:899, emoji:"☕", desc:"Premium single-origin beans from 5 countries with tasting notes.", rating:4.9, reviews:887, badge:"popular", tags:["Parent","Colleague","Adult","Senior"] },
+  { id:3, name:"Silk Sleep Mask", cat:"Wellness", price:549, emoji:"😴", desc:"100% mulberry silk for the ultimate beauty sleep experience.", rating:4.7, reviews:1204, badge:"new", tags:["Partner","Friend","Young Adult","Adult"] },
+  { id:4, name:"Mini Polaroid Camera", cat:"Tech", price:3499, originalPrice:3999, emoji:"📷", desc:"Capture & print memories instantly. Includes 10 film sheets.", rating:4.6, reviews:678, badge:"popular", tags:["Friend","Sibling","Teen (13–17)","Young Adult"] },
+  { id:5, name:"Scented Candle Trio", cat:"Wellness", price:799, emoji:"🕯️", desc:"Lavender, Sandalwood & Vanilla. 45h burn time each.", rating:4.9, reviews:3201, tags:["Partner","Parent","Friend","Adult","Senior"] },
+  { id:6, name:"Leather Cardholder", cat:"Fashion", price:699, emoji:"👜", desc:"Slim genuine leather. Holds 8 cards. Available in 4 colours.", rating:4.5, reviews:540, tags:["Colleague","Parent","Adult"] },
+  { id:7, name:"Personalised Journal", cat:"Books", price:449, emoji:"📓", desc:"A5 hardcover with 200 dotted pages. Add their name on cover.", rating:4.8, reviews:2100, badge:"new", tags:["Friend","Sibling","Young Adult","Teen (13–17)"] },
+  { id:8, name:"Plant Grow Kit", cat:"Home", price:599, emoji:"🌱", desc:"Everything to grow herbs at home — seeds, soil, pots & guide.", rating:4.7, reviews:450, tags:["Parent","Friend","Adult","Senior"] },
+  { id:9, name:"Gourmet Chocolate Box", cat:"Food", price:349, emoji:"🍫", desc:"24 artisan truffles in 8 exotic flavours. Gorgeous gift box.", rating:4.9, reviews:4500, badge:"popular", tags:["Partner","Parent","Colleague","Child"] },
+  { id:10, name:"Smart Watch Fit", cat:"Tech", price:4999, originalPrice:5999, emoji:"⌚", desc:"Track fitness, sleep & notifications. 7-day battery.", rating:4.6, reviews:890, badge:"sale", tags:["Partner","Sibling","Young Adult","Adult"] },
+  { id:11, name:"Kids STEM Kit", cat:"Toys", price:899, emoji:"🔬", desc:"50+ experiments in chemistry, physics & biology. Age 6–12.", rating:4.8, reviews:1230, tags:["Child","Kid (0–12)"] },
+  { id:12, name:"Spa Pamper Set", cat:"Wellness", price:1299, emoji:"🛁", desc:"Bath salts, face mask, body oil & scrub — the full ritual.", rating:4.9, reviews:2800, badge:"popular", tags:["Partner","Friend","Young Adult","Adult"] },
+  { id:13, name:"Board Game Collection", cat:"Toys", price:1499, emoji:"🎲", desc:"5-in-1 family game set. Hours of fun for all ages.", rating:4.7, reviews:670, tags:["Friend","Child","Kid (0–12)","Teen (13–17)","Adult","Senior"] },
+  { id:14, name:"Bluetooth Speaker Mini", cat:"Tech", price:1799, emoji:"🔊", desc:"360° sound, IPX7 waterproof, 12h playtime.", rating:4.7, reviews:1100, tags:["Friend","Sibling","Young Adult","Teen (13–17)"] },
+  { id:15, name:"Succulent Terrarium Kit", cat:"Home", price:749, emoji:"🌵", desc:"Cute glass terrarium with 3 succulents and decorative stones.", rating:4.8, reviews:530, tags:["Friend","Colleague","Young Adult"] },
+  { id:16, name:"Cooking Masterclass", cat:"Experience", price:2499, emoji:"👨‍🍳", desc:"Online live cooking class with a Michelin-starred chef.", rating:4.9, reviews:320, badge:"new", tags:["Partner","Parent","Adult","Senior"] },
+  { id:17, name:"Kids Art Set", cat:"Toys", price:599, emoji:"🎨", desc:"120-piece art kit with paints, brushes, crayons & stencils.", rating:4.8, reviews:980, tags:["Child","Kid (0–12)"] },
+  { id:18, name:"Premium Bookmark Set", cat:"Books", price:249, emoji:"🔖", desc:"Set of 6 handcrafted metal bookmarks with inspirational quotes.", rating:4.6, reviews:760, tags:["Friend","Colleague","Parent","Senior"] },
+  { id:19, name:"Aromatic Tea Box", cat:"Food", price:649, emoji:"🍵", desc:"20 varieties of premium teas from around the world.", rating:4.8, reviews:1450, tags:["Parent","Colleague","Senior","Adult"] },
+  { id:20, name:"Star Map Print", cat:"Home", price:899, emoji:"⭐", desc:"Custom star map of any date & place. Framed & ready to hang.", rating:4.9, reviews:2300, badge:"popular", tags:["Partner","Friend","Young Adult"] },
+  { id:21, name:"Yoga Starter Kit", cat:"Wellness", price:1899, emoji:"🧘", desc:"Non-slip mat, 2 blocks, strap & carry bag. Beginner-friendly.", rating:4.7, reviews:670, tags:["Friend","Partner","Young Adult","Adult"] },
+  { id:22, name:"Remote Control Car", cat:"Toys", price:1199, emoji:"🏎️", desc:"High-speed RC car with 30min runtime. Indoor & outdoor.", rating:4.6, reviews:890, tags:["Child","Teen (13–17)","Kid (0–12)"] },
+  { id:23, name:"Cashmere Scarf", cat:"Fashion", price:2299, originalPrice:2799, emoji:"🧣", desc:"Ultra-soft 100% cashmere. Available in 12 colours.", rating:4.8, reviews:430, badge:"sale", tags:["Parent","Partner","Senior","Adult"] },
+  { id:24, name:"Pottery Class Experience", cat:"Experience", price:1999, emoji:"🏺", desc:"3-hour hands-on pottery class for two. All materials included.", rating:4.9, reviews:210, badge:"new", tags:["Partner","Friend","Young Adult"] },
+];
+
+const COLORS = [
+  "linear-gradient(135deg, #FFE0E0, #FFD6F0)",
+  "linear-gradient(135deg, #E0F0FF, #E8E0FF)",
+  "linear-gradient(135deg, #E0FFE8, #E0FFF5)",
+  "linear-gradient(135deg, #FFF5E0, #FFE8D0)",
+  "linear-gradient(135deg, #F0E0FF, #E0E8FF)",
+  "linear-gradient(135deg, #FFE0F5, #FFE8E0)",
+];
+
+// ─────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────
+let wizardAnswers = { relationship: null, age: null, budget: 2500 };
+let cart = JSON.parse(localStorage.getItem('giftly-cart') || '[]');
+let currentStep = 1;
+let activeCategory = 'All';
+let filteredProducts = [];
+
+// ─────────────────────────────────────────
+// WIZARD
+// ─────────────────────────────────────────
+function selectOption(el) {
+  const step = el.dataset.step;
+  document.querySelectorAll(`[data-step="${step}"]`).forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+
+  if(step == '1') {
+    wizardAnswers.relationship = el.dataset.val;
+    document.getElementById('step1-next').disabled = false;
+    animateIllustration(el.querySelector('.emoji').textContent);
+  } else if(step == '2') {
+    wizardAnswers.age = el.dataset.val;
+    document.getElementById('step2-next').disabled = false;
+  }
+}
+
+function animateIllustration(emoji) {
+  const el = document.getElementById('step1-ill');
+  el.style.transform = 'scale(1.3)';
+  el.textContent = emoji;
+  setTimeout(() => el.style.transform = '', 300);
+}
+
+function updateBudget(val) {
+  wizardAnswers.budget = parseInt(val);
+  document.getElementById('budget-val').textContent = parseInt(val).toLocaleString('en-IN');
+  const min = 200, max = 10000;
+  const pct = ((val - min) / (max - min)) * 100;
+  document.getElementById('budget-slider').style.setProperty('--pct', pct + '%');
+}
+
+function nextStep(step) {
+  document.getElementById('step-' + currentStep).style.display = 'none';
+  document.getElementById('dot-' + currentStep).classList.remove('active');
+  document.getElementById('dot-' + currentStep).classList.add('done');
+
+  currentStep = step;
+  const el = document.getElementById('step-' + step);
+  el.style.display = 'block';
+  el.style.animation = 'none';
+  requestAnimationFrame(() => { el.style.animation = ''; });
+  document.getElementById('dot-' + step).classList.add('active');
+
+  const fills = { 2: '50%', 3: '85%' };
+  document.getElementById('progress-fill').style.width = fills[step] || '5%';
+}
+
+function goBack(step) {
+  document.getElementById('step-' + currentStep).style.display = 'none';
+  document.getElementById('dot-' + currentStep).classList.remove('active', 'done');
+
+  currentStep = step;
+  document.getElementById('step-' + step).style.display = 'block';
+  document.getElementById('dot-' + step).classList.remove('done');
+  document.getElementById('dot-' + step).classList.add('active');
+
+  const fills = { 1: '5%', 2: '50%' };
+  document.getElementById('progress-fill').style.width = fills[step] || '5%';
+}
+
+function findGifts() {
+  document.getElementById('progress-fill').style.width = '100%';
+  ['dot-1','dot-2','dot-3'].forEach(id => {
+    document.getElementById(id).classList.remove('active');
+    document.getElementById(id).classList.add('done');
+  });
+
+  setTimeout(() => {
+    document.getElementById('wizard-section').style.display = 'none';
+    const shop = document.getElementById('shop-section');
+    shop.classList.add('visible');
+
+    // Update subtitle & tags
+    const rel = wizardAnswers.relationship || 'Friend';
+    const age = wizardAnswers.age || 'Adult (31–60)';
+    const budget = wizardAnswers.budget;
+    document.getElementById('shop-subtitle').textContent =
+      `Handpicked for your ${rel.toLowerCase()} · ${age} · Budget ₹${budget.toLocaleString('en-IN')}`;
+
+    const tagRow = document.getElementById('tag-row');
+    tagRow.innerHTML = `<div class="tag">💝 For ${rel}</div><div class="tag">🎂 ${age}</div><div class="tag">💰 Under ₹${budget.toLocaleString('en-IN')}</div>`;
+
+    buildProductList();
+    renderProducts();
+  }, 400);
+}
+
+function resetWizard() {
+  wizardAnswers = { relationship: null, age: null, budget: 2500 };
+  currentStep = 1;
+  document.getElementById('shop-section').classList.remove('visible');
+  document.getElementById('shop-section').style.display = 'none';
+  setTimeout(() => document.getElementById('shop-section').style.display = '', 10);
+  document.getElementById('wizard-section').style.display = 'block';
+
+  // Reset dots
+  document.getElementById('dot-1').className = 'step-dot active';
+  document.getElementById('dot-1').innerHTML = '<span>1</span>';
+  document.getElementById('dot-2').className = 'step-dot';
+  document.getElementById('dot-2').innerHTML = '<span>2</span>';
+  document.getElementById('dot-3').className = 'step-dot';
+  document.getElementById('dot-3').innerHTML = '<span>3</span>';
+  document.getElementById('progress-fill').style.width = '5%';
+  document.getElementById('step-1').style.display = 'block';
+  document.getElementById('step-2').style.display = 'none';
+  document.getElementById('step-3').style.display = 'none';
+  document.querySelectorAll('.option-pill').forEach(p => p.classList.remove('selected'));
+  document.getElementById('step1-next').disabled = true;
+  document.getElementById('step2-next').disabled = true;
+  document.getElementById('budget-slider').value = 2500;
+  document.getElementById('budget-val').textContent = '2,500';
+  document.getElementById('search-input').value = '';
+  activeCategory = 'All';
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  document.querySelector('[data-cat="All"]').classList.add('active');
+  document.getElementById('price-select').value = 'all';
+}
+
+// ─────────────────────────────────────────
+// PRODUCTS
+// ─────────────────────────────────────────
+function buildProductList() {
+  const { relationship, age, budget } = wizardAnswers;
+  filteredProducts = ALL_PRODUCTS.filter(p => {
+    const matchRel = !relationship || p.tags.includes(relationship);
+    const matchAge = !age || p.tags.some(t => t === age || !['Kid (0–12)','Teen (13–17)','Young Adult (18–30)','Adult (31–60)','Senior (60+)'].includes(t));
+    const inBudget = p.price <= budget;
+    return inBudget && (matchRel || matchAge);
+  });
+  // If too few, fill with budget-matching
+  if(filteredProducts.length < 6) {
+    filteredProducts = ALL_PRODUCTS.filter(p => p.price <= budget);
+  }
+  if(filteredProducts.length === 0) filteredProducts = ALL_PRODUCTS.slice(0, 12);
+}
+
+function filterProducts() {
+  renderProducts();
+}
+
+function filterCat(el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  activeCategory = el.dataset.cat;
+  renderProducts();
+}
+
+function renderProducts() {
+  const search = document.getElementById('search-input').value.toLowerCase();
+  const priceFilter = document.getElementById('price-select').value;
+
+  let pool = activeCategory === 'All'
+    ? filteredProducts
+    : filteredProducts.filter(p => p.cat === activeCategory);
+
+  if(search) pool = pool.filter(p =>
+    p.name.toLowerCase().includes(search) || p.desc.toLowerCase().includes(search) || p.cat.toLowerCase().includes(search)
+  );
+
+  pool = pool.filter(p => {
+    if(priceFilter === 'budget') return p.price < 500;
+    if(priceFilter === 'mid') return p.price >= 500 && p.price < 2000;
+    if(priceFilter === 'premium') return p.price >= 2000 && p.price < 5000;
+    if(priceFilter === 'luxury') return p.price >= 5000;
+    return true;
+  });
+
+  document.getElementById('results-info').innerHTML =
+    `Showing <strong>${pool.length}</strong> gift${pool.length !== 1 ? 's' : ''}`;
+
+  const grid = document.getElementById('products-grid');
+  if(pool.length === 0) {
+    grid.innerHTML = `<div class="no-results"><div class="nr-icon">🔍</div><h3>No gifts found</h3><p>Try adjusting your filters</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = pool.map((p, i) => {
+    const inCart = cart.find(c => c.id === p.id);
+    const bg = COLORS[p.id % COLORS.length];
+    const badge = p.badge
+      ? `<div class="badge badge-${p.badge}">${p.badge === 'popular' ? '🔥 Popular' : p.badge === 'new' ? '✨ New' : '🏷️ Sale'}</div>`
+      : '';
+    const original = p.originalPrice ? `<span class="original">₹${p.originalPrice.toLocaleString('en-IN')}</span>` : '';
+    const stars = '★'.repeat(Math.floor(p.rating)) + (p.rating % 1 ? '½' : '');
+
+    return `
+    <div class="product-card" style="animation-delay:${i * 0.06}s">
+      <div class="card-image" style="background:${bg}">
+        ${badge}
+        <button class="wishlist-btn" onclick="toggleWishlist(this)" title="Wishlist">♡</button>
+        <span style="filter:drop-shadow(0 4px 8px rgba(0,0,0,0.1))">${p.emoji}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-category">${p.cat}</div>
+        <div class="card-name">${p.name}</div>
+        <div class="card-desc">${p.desc}</div>
+        <div class="card-rating">
+          <span class="stars">${stars}</span>
+          <span class="rating-count">${p.rating} (${p.reviews.toLocaleString()})</span>
+        </div>
+        <div class="card-footer">
+          <div class="card-price">${original}₹${p.price.toLocaleString('en-IN')}</div>
+          <button class="add-btn ${inCart ? 'added' : ''}" onclick="addToCart(${p.id}, this)">
+            ${inCart ? '✓ Added' : '+ Cart'}
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleWishlist(btn) {
+  btn.classList.toggle('loved');
+  btn.textContent = btn.classList.contains('loved') ? '♥' : '♡';
+}
+
+// ─────────────────────────────────────────
+// CART
+// ─────────────────────────────────────────
+function addToCart(id, btn) {
+  const product = ALL_PRODUCTS.find(p => p.id === id);
+  if(!product) return;
+
+  const existing = cart.find(c => c.id === id);
+  if(existing) {
+    existing.qty++;
+  } else {
+    cart.push({ ...product, qty: 1 });
+  }
+
+  saveCart();
+  updateCartUI();
+  btn.classList.add('added');
+  btn.textContent = '✓ Added';
+
+  const badge = document.getElementById('cart-badge');
+  badge.classList.remove('pop');
+  void badge.offsetWidth;
+  badge.classList.add('pop');
+
+  showToast(`${product.emoji} ${product.name} added to cart!`);
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(c => c.id !== id);
+  saveCart();
+  updateCartUI();
+  renderCartItems();
+  renderProducts(); // Update add buttons
+}
+
+function changeQty(id, delta) {
+  const item = cart.find(c => c.id === id);
+  if(!item) return;
+  item.qty += delta;
+  if(item.qty <= 0) { removeFromCart(id); return; }
+  saveCart();
+  updateCartUI();
+  renderCartItems();
+}
+
+function saveCart() {
+  localStorage.setItem('giftly-cart', JSON.stringify(cart));
+}
+
+function updateCartUI() {
+  const total = cart.reduce((s, c) => s + c.qty, 0);
+  document.getElementById('cart-badge').textContent = total;
+  const amount = cart.reduce((s, c) => s + c.price * c.qty, 0);
+  document.getElementById('cart-total').textContent = '₹' + amount.toLocaleString('en-IN');
+  document.getElementById('checkout-btn').disabled = cart.length === 0;
+}
+
+function renderCartItems() {
+  const container = document.getElementById('cart-items');
+  if(cart.length === 0) {
+    container.innerHTML = `<div class="cart-empty"><div class="empty-icon">🛍️</div><p>Your cart is empty</p><p style="font-size:0.82rem;color:var(--muted)">Add some gifts!</p></div>`;
+    return;
+  }
+  container.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="ci-image">${item.emoji}</div>
+      <div class="ci-info">
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-price">₹${item.price.toLocaleString('en-IN')}</div>
+        <div class="ci-qty">
+          <button class="qty-btn" onclick="changeQty(${item.id}, -1)">−</button>
+          <span class="qty-num">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+        </div>
+      </div>
+      <button class="ci-remove" onclick="removeFromCart(${item.id})" title="Remove">🗑️</button>
+    </div>
+  `).join('');
+}
+
+function openCart() {
+  renderCartItems();
+  updateCartUI();
+  document.getElementById('cart-overlay').classList.add('open');
+}
+
+function closeCart() {
+  document.getElementById('cart-overlay').classList.remove('open');
+}
+
+function handleOverlayClick(e) {
+  if(e.target === document.getElementById('cart-overlay')) closeCart();
+}
+
+function checkout() {
+  showToast('🎉 Order placed! Thank you for spreading joy!');
+  cart = [];
+  saveCart();
+  updateCartUI();
+  renderCartItems();
+  closeCart();
+  renderProducts();
+}
+
+// ─────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────
+updateCartUI();
+updateBudget(2500);
+</script>
+</body>
+</html>
